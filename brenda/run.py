@@ -80,7 +80,8 @@ def spot(opts, conf):
         'security_groups' : sec_groups,
         'block_device_map' : bdm,
         }
-
+    if opts.availability_zone:
+        run_args['availability_zone_group'] = opts.availability_zone
     print "----------------------------"
     print "AMI ID:", ami_id
     print "Max bid price", price
