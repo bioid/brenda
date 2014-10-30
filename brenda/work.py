@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import random
+import random, json
 from brenda import aws
 
 def subframe_iterator_defined(opts):
@@ -69,16 +69,19 @@ def push(opts, args, conf):
     if opts.randomize:
         random.shuffle(tasklist)
 
+    # store a json-encoded version of the config to pass with each task, filtering out any potentially sensitive data
+    configexcludes = ['AWS_SECRET_KEY', 'AWS_ACCESS_KEY']
+    jsonconfig = json.dumps(dict((x, conf[x]) for x in conf if x not in configexcludes)) 
+
     # get work queue
     q = None
     if not opts.dry_run:
         q = aws.create_sqs_queue(conf)
-
     # push work queue to sqs
     for task in tasklist:
         print task,
         if q is not None:
-            aws.write_sqs_queue(task, q)
+            aws.write_sqs_queue(task, q, { "config": jsonconfig })
 
 def status(opts, args, conf):
     q = aws.get_sqs_queue(conf)
