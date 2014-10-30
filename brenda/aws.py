@@ -151,9 +151,20 @@ def get_sqs_conn_queue(conf):
 def get_sqs_queue(conf):
     return get_sqs_conn_queue(conf)[0]
 
-def write_sqs_queue(string, queue):
+def write_sqs_queue(string, queue, attrs=None):
     m = boto.sqs.message.Message()
     m.set_body(string)
+
+    # If attributes are passed, encode them into SQS message attributes
+    if attrs:
+        ma = {}
+        for k in attrs.keys():
+            ma[k] = {
+              "data_type": "String",
+              "string_value": attrs[k]
+            }
+        m.message_attributes = ma
+
     queue.write(m)
 
 def get_ec2_instances_from_conn(conn, instance_ids=None):
