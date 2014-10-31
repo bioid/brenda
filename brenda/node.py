@@ -189,6 +189,7 @@ def run_tasks(opts, args, conf):
 
                     # do macro substitution on the task script
                     script = script.replace('$OUTDIR', task.outdir)
+                    script = script.replace('$BLENDFILE', taskconfig.get('BLENDER_FILE', '*.blend'))
 
                     # add shebang if absent
                     if not script.startswith("#!"):
@@ -198,8 +199,7 @@ def run_tasks(opts, args, conf):
                     # FIXME - this is likely not the most efficient way of doing it, and probably leads to unnecessary
                     #         downloads from s3.  Ideally we would keep all project directories and switch between them,
                     #         but currently brenda only supports one working project directory at a time
-                    if 'BLENDER_PROJECT' in taskconfig and taskconfig['BLENDER_PROJECT'] != conf['BLENDER_PROJECT']:
-                        proj_dir = get_project(taskconfig, taskconfig['BLENDER_PROJECT'])
+                    proj_dir = get_project(taskconfig, taskconfig['BLENDER_PROJECT'])
 
                     # cd to project directory, where we will run blender from
                     with utils.Cd(proj_dir) as cd:
