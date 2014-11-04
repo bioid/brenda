@@ -56,6 +56,10 @@ def push(opts, args, conf):
               ("$STEP", "%d" % (step,))
               ):
             script = script.replace(key, value)
+
+        for key in conf:
+            script = script.replace("$" + key, conf[key]);
+
         if subframe_iterator_defined(opts):
             for macro_list in subframe_iterator(opts):
                 sf_script = script
