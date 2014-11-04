@@ -181,14 +181,21 @@ def run_tasks(opts, args, conf):
                     if 'config' in task.msg.message_attributes:
                         taskconfig.update(json.loads(task.msg.message_attributes['config']['string_value']))
 
+                    # Store outdir in task config for later use
+                    taskconfig['OUTDIR'] = task.outdir
+                    if not 'BLENDER_FILE' in taskconfig:
+                        taskconfig['BLENDER_FILE'] = '*.blend'
+
                     print "task-specific config:", taskconfig
 
                     # get the task script
                     script = task.msg.get_body()
                     print "script len:", len(script)
 
+
                     # do macro substitution on the task script
-                    script = script.replace('$OUTDIR', task.outdir)
+                    for k in taskconfig:
+                        script = script.replace('$' + k, taskconfig[k])
 
                     # add shebang if absent
                     if not script.startswith("#!"):
@@ -198,8 +205,7 @@ def run_tasks(opts, args, conf):
                     # FIXME - this is likely not the most efficient way of doing it, and probably leads to unnecessary
                     #         downloads from s3.  Ideally we would keep all project directories and switch between them,
                     #         but currently brenda only supports one working project directory at a time
-                    if 'BLENDER_PROJECT' in taskconfig and taskconfig['BLENDER_PROJECT'] != conf['BLENDER_PROJECT']:
-                        proj_dir = get_project(taskconfig, taskconfig['BLENDER_PROJECT'])
+                    proj_dir = get_project(taskconfig, taskconfig['BLENDER_PROJECT'])
 
                     # cd to project directory, where we will run blender from
                     with utils.Cd(proj_dir) as cd:
