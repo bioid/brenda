@@ -181,15 +181,21 @@ def run_tasks(opts, args, conf):
                     if 'config' in task.msg.message_attributes:
                         taskconfig.update(json.loads(task.msg.message_attributes['config']['string_value']))
 
+                    # Store outdir in task config for later use
+                    taskconfig['OUTDIR'] = task.outdir
+                    if not 'BLENDER_FILE' in taskconfig:
+                        taskconfig['BLENDER_FILE'] = '*.blend'
+
                     print "task-specific config:", taskconfig
 
                     # get the task script
                     script = task.msg.get_body()
                     print "script len:", len(script)
 
+
                     # do macro substitution on the task script
-                    script = script.replace('$OUTDIR', task.outdir)
-                    script = script.replace('$BLENDFILE', taskconfig.get('BLENDER_FILE', '*.blend'))
+                    for k in taskconfig:
+                        script = script.replace('$' + k, taskconfig[k])
 
                     # add shebang if absent
                     if not script.startswith("#!"):
