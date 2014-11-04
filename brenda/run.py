@@ -38,11 +38,15 @@ def demand(opts, conf):
         'security_groups' : sec_groups,
         'block_device_map' : bdm,
         }
+    if opts.availability_zone:
+        run_args['placement'] = opts.availability_zone
 
     print "----------------------------"
     print "AMI ID:", ami_id
     print "Instance type:", itype
     print "Max instances:", opts.n_instances
+    if opts.availability_zone:
+        print "Availability zone:", opts.availability_zone
     if snap_description:
         print "Project EBS snapshot:", snap_description
     if istore_dev:
@@ -80,6 +84,8 @@ def spot(opts, conf):
         'security_groups' : sec_groups,
         'block_device_map' : bdm,
         }
+    if opts.availability_zone:
+        run_args['placement'] = opts.availability_zone
 
     print "----------------------------"
     print "AMI ID:", ami_id
@@ -87,6 +93,9 @@ def spot(opts, conf):
     print "Request type:", reqtype
     print "Instance type:", itype
     print "Instance count:", opts.n_instances
+    if opts.availability_zone:
+        print "Availability zone:", opts.availability_zone
+
     if snap_description:
         print "Project EBS snapshot:", snap_description
     if istore_dev:
