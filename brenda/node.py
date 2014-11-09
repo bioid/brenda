@@ -371,7 +371,7 @@ def run_tasks(opts, args, conf):
             if len(spot_requests) > 0:
                 spot_request_create_time = spot_requests[0].create_time
                 print "Found create_time for spot request %s: %s" % (spot_request_id, spot_request_create_time)
-        except EC2ResponseError:
+        except boto.exception.EC2ResponseError:
             print "Error looking up spot request by id %s: %s" % (spot_request_id, spot_request_create_time)
 
     # get project (from s3:// or file://)
