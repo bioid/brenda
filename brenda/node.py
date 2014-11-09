@@ -301,9 +301,8 @@ def run_tasks(opts, args, conf):
                     elif action == "smart":
                         now = time.time()
                         try:
-                            if not spot_request_id:
-                                instance_id = aws.get_instance_id_self()
-                                spot_request_id = aws.get_spot_request_from_instance_id(conf, instance_id)
+                            instance_id = aws.get_instance_id_self()
+                            spot_request_id = aws.get_spot_request_from_instance_id(conf, instance_id)
                             launch_time = aws.get_launch_time(conf, spot_request_id)
                             if launch_time:
                                 spottime = aws.get_uptime(now, launch_time)
