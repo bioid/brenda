@@ -300,15 +300,19 @@ def run_tasks(opts, args, conf):
                         time.sleep(15)
                     elif action == "smart":
                         now = time.time()
-                        spottime = aws.get_uptime(now, spot_request_create_time)
-                        minutes_after_hour = (spottime / 60) % 60
-                        print "Smart poll: ", minutes_after_hour
-                        if minutes_after_hour >= smart_shutdown_threshold:
-                            print "Smart poll threshold passed, shutting down (%d minutes after the hour with no work in queue)" % (minutes_after_hour)
-                            # update the value of DONE config var for clean shutdown
-                            conf['DONE'] = 'shutdown'
-                            write_done_file()
-                            break;
+                        try:
+                            launch_time = aws.get_launch_time(conf, spot_request_id)
+                            spottime = aws.get_uptime(now, launch_time)
+                            minutes_after_hour = (spottime / 60) % 60
+                            print "Smart poll: ", minutes_after_hour
+                            if minutes_after_hour >= smart_shutdown_threshold:
+                                print "Smart poll threshold passed, shutting down (%d minutes after the hour with no work in queue)" % (minutes_after_hour)
+                                # update the value of DONE config var for clean shutdown
+                                conf['DONE'] = 'shutdown'
+                                write_done_file()
+                                break;
+                        except Exception:
+                            print "Smart poll failed!"
 
                         time.sleep(15)
                     else:
