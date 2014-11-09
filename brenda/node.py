@@ -298,7 +298,7 @@ def run_tasks(opts, args, conf):
                     if action == "poll":
                         print "Polling for more work..."
                         time.sleep(15)
-                    else if action == "smart":
+                    elif action == "smart":
                     #aws.cancel_spot_request(conf, spot_request_id)
                         spot_request = get_spot_request_from_instance_id(spot_request_id)
                         print "Smart poll: ", spot_request.create_time, now
