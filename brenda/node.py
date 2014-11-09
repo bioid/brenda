@@ -366,9 +366,13 @@ def run_tasks(opts, args, conf):
 
         # Store actual spot request create time, for smart shutdown calculations
         ec2 = aws.get_ec2_conn(conf)
-        spot_requests = ec2.get_all_spot_instance_requests(request_ids=[spot_request_id])
-        if len(spot_requests) > 0:
-            spot_request_create_time = spot_requests[0].create_time
+        try:
+            spot_requests = ec2.get_all_spot_instance_requests(request_ids=[spot_request_id])
+            if len(spot_requests) > 0:
+                spot_request_create_time = spot_requests[0].create_time
+                print "Found create_time for spot request %s: %s" % (spot_request_id, spot_request_create_time)
+        except EC2ResponseError:
+            print "Error looking up spot request by id %s: %s" % (spot_request_id, spot_request_create_time)
 
     # get project (from s3:// or file://)
     blender_project = conf.get('BLENDER_PROJECT')
