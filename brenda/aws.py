@@ -206,6 +206,16 @@ def get_uptime(now, aws_launch_time):
     lt = boto.utils.parse_ts(aws_launch_time)
     return int(now - calendar.timegm(lt.timetuple()))
 
+def get_launch_time(conf, spot_request_id):
+    ec2 = get_ec2_conn(conf)
+    try:
+        spot_requests = ec2.get_all_spot_instance_requests(request_ids=[spot_request_id])
+        if len(spot_requests) > 0:
+            return spot_requests[0].create_time
+    except boto.exception.EC2ResponseError:
+        pass
+    return None
+
 def filter_instances(opts, conf, hostset=None):
     def threshold_test(aws_launch_time):
         ut = get_uptime(now, aws_launch_time)
