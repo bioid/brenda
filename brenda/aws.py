@@ -412,7 +412,7 @@ def config_file_name():
     return config
 
 def validate_done(d):
-    done_choices = ('exit', 'shutdown', 'poll')
+    done_choices = ('exit', 'shutdown', 'poll', 'smart')
     if d not in done_choices:
         raise ValueError("DONE config var must be one of %r" % (done_choices,))
 
