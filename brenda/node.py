@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, signal, subprocess, multiprocessing, stat, time, json
+import os, sys, signal, subprocess, multiprocessing, stat, time, json, datetime
 import paracurl
 from brenda import aws, utils, error
 
@@ -299,13 +299,18 @@ def run_tasks(opts, args, conf):
                         print "Polling for more work..."
                         time.sleep(15)
                     elif action == "smart":
-                    #aws.cancel_spot_request(conf, spot_request_id)
-                        spot_request = get_spot_request_from_instance_id(spot_request_id)
-                        print "Smart poll: ", spot_request.create_time, now
-                        time.sleep(15)
+                        now = time.time()
+                        spottime = aws.get_uptime(now, spot_request_create_time)
+                        minutes_after_hour = (spottime / 60) % 60
+                        print "Smart poll: ", minutes_after_hour
+                        if minutes_after_hour >= smart_shutdown_threshold:
+                            print "Smart poll threshold passed, shutting down (%d minutes after the hour with no work in queue)" % (minutes_after_hour)
+                            # update the value of DONE config var for clean shutdown
+                            conf['DONE'] = 'shutdown'
+                            write_done_file()
+                            break;
 
-                        # if (now - spot_request.create_time) % 3600 < 5:
-                        #     break;
+                        time.sleep(15)
                     else:
                         break
 
@@ -345,6 +350,10 @@ def run_tasks(opts, args, conf):
     # save the value of DONE config var
     write_done_file()
 
+    # Prepare for smart shutdown
+    smart_shutdown_threshold = int(conf.get('SMART_SHUTDOWN_THRESHOLD', 58))
+    spot_request_create_time = datetime.datetime.now().isoformat()
+
     # Get our spot instance request, if it exists
     spot_request_id = None
     if int(conf.get('RUNNING_ON_EC2', '1')):
@@ -354,6 +363,12 @@ def run_tasks(opts, args, conf):
             print "Spot request ID:", spot_request_id
         except Exception, e:
             print "Error determining spot instance request:", e
+
+        # Store actual spot request create time, for smart shutdown calculations
+        ec2 = aws.get_ec2_conn(conf)
+        spot_requests = ec2.get_all_spot_instance_requests(request_ids=[spot_request_id])
+        if len(spot_requests) > 0:
+            spot_request_create_time = spot_requests[0].create_time
 
     # get project (from s3:// or file://)
     blender_project = conf.get('BLENDER_PROJECT')
