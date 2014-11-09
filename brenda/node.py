@@ -294,9 +294,18 @@ def run_tasks(opts, args, conf):
 
                 # if no active task and no S3-push task, we are done (unless DONE is set to "poll")
                 if not local.task_active and not local.task_push:
-                    if read_done_file() == "poll":
+                    action = read_done_file()
+                    if action == "poll":
                         print "Polling for more work..."
                         time.sleep(15)
+                    else if action == "smart":
+                    #aws.cancel_spot_request(conf, spot_request_id)
+                        spot_request = get_spot_request_from_instance_id(spot_request_id)
+                        print "Smart poll: ", spot_request.create_time, now
+                        time.sleep(15)
+
+                        # if (now - spot_request.create_time) % 3600 < 5:
+                        #     break;
                     else:
                         break
 
