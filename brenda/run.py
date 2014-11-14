@@ -260,11 +260,11 @@ cd "$B"
     keys = [
         'AWS_ACCESS_KEY',
         'AWS_SECRET_KEY',
-        'BLENDER_PROJECT',
-        'WORK_QUEUE',
-        'RENDER_OUTPUT'
         ]
     optional_keys = [
+        "BLENDER_PROJECT",
+        "WORK_QUEUE",
+        "RENDER_OUTPUT"
         "S3_REGION",
         "SQS_REGION",
         "CURL_MAX_THREADS",

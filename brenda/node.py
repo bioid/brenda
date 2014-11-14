@@ -344,7 +344,7 @@ def run_tasks(opts, args, conf):
     visibility_timeout = int(conf.get('VISIBILITY_TIMEOUT', '120'))
 
     # validate RENDER_OUTPUT bucket
-    aws.get_s3_output_bucket(conf)
+    #aws.get_s3_output_bucket(conf)
 
     # file cleanup
     utils.rm('task_count')
