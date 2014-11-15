@@ -207,6 +207,9 @@ def run_tasks(opts, args, conf):
                     #         but currently brenda only supports one working project directory at a time
                     proj_dir = get_project(taskconfig, taskconfig['BLENDER_PROJECT'])
 
+                    # mount additional EBS volumes
+                    aws.mount_additional_ebs(conf, proj_dir)
+
                     # cd to project directory, where we will run blender from
                     with utils.Cd(proj_dir) as cd:
                         # write script file and make it executable
@@ -383,15 +386,16 @@ def run_tasks(opts, args, conf):
 
     # get project (from s3:// or file://)
     blender_project = conf.get('BLENDER_PROJECT')
-    if not blender_project:
-        raise ValueError("BLENDER_PROJECT not defined in configuration")
+    #if not blender_project:
+    #    raise ValueError("BLENDER_PROJECT not defined in configuration")
 
     # directory that blender will be run from
-    proj_dir = get_project(conf, blender_project)
-    print "PROJ_DIR", proj_dir
+    if blender_project:
+        proj_dir = get_project(conf, blender_project)
+        print "PROJ_DIR", proj_dir
 
-    # mount additional EBS volumes
-    aws.mount_additional_ebs(conf, proj_dir)
+        # mount additional EBS volumes
+        aws.mount_additional_ebs(conf, proj_dir)
 
     # continue only if we are not in "dry-run" mode
     if not opts.dry_run:
