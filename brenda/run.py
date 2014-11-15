@@ -230,6 +230,11 @@ def startup_script(opts, conf, istore_dev):
 
     head = "#!/bin/bash\n"
 
+    # Pre-run script?
+    startup_prerun = conf.get('STARTUP_PRERUN', False)
+    if startup_prerun:
+        head += startup_prerun + "\n"
+
     # use EC2 instance store on render farm instance?
     use_istore = int(conf.get('USE_ISTORE', '1' if istore_dev else '0'))
 
