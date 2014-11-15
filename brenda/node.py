@@ -208,7 +208,7 @@ def run_tasks(opts, args, conf):
                     proj_dir = get_project(taskconfig, taskconfig['BLENDER_PROJECT'])
 
                     # mount additional EBS volumes
-                    aws.mount_additional_ebs(conf, proj_dir)
+                    aws.mount_additional_ebs(taskconfig, proj_dir)
 
                     # cd to project directory, where we will run blender from
                     with utils.Cd(proj_dir) as cd:
