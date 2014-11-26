@@ -269,7 +269,8 @@ cd "$B"
     optional_keys = [
         "BLENDER_PROJECT",
         "WORK_QUEUE",
-        "RENDER_OUTPUT"
+        "RENDER_OUTPUT",
+        "EC2_REGION",
         "S3_REGION",
         "SQS_REGION",
         "CURL_MAX_THREADS",
